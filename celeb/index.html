@@ -1,0 +1,301 @@
+              
+              
+              <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Text on Image</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .carousel {
+            position: relative;
+            width: 320px;
+            height: 570px; 
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+
+        .carousel-inner {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            position: relative;
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .text-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-size: 20px;
+            text-align: center;
+            cursor: move;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .controls input,
+        .controls select,
+        .controls button {
+            padding: 5px;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .carousel-controls button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .carousel-controls button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="carousel" id="carousel">
+            <div class="carousel-inner" id="carouselInner">
+                <div class="slide">
+                    <img src="photo-1558572687-df2e1e142ea3.avif" alt="Slide 1">
+                    <div class="text-overlay" contenteditable="true">Slide 1 Text</div>
+                </div>
+                <div class="slide">
+                    <img src="photo-1564527570687-f21b90a09746.avif" alt="Slide 2">
+                    <div class="text-overlay" contenteditable="true">Slide 2 Text</div>
+                </div>
+                <div class="slide">
+                    <img src="premium_photo-1663040525221-c607b4333b76.avif" alt="Slide 3">
+                    <div class="text-overlay" contenteditable="true">Slide 3 Text</div>
+                </div>
+            </div>
+            <div class="carousel-controls">
+                <button id="prevSlide">&#10094;</button>
+                <button id="nextSlide">&#10095;</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" id="textInput" placeholder="Enter text here" />
+            <input type="color" id="textColor" value="#000000">
+            <select id="fontSize">
+                <option value="16">16px</option>
+                <option value="20" selected>20px</option>
+                <option value="24">24px</option>
+                <option value="28">28px</option>
+                <option value="32">32px</option>
+            </select>
+            <select id="textAlignment">
+                <option value="left">Left</option>
+                <option value="center" selected>Center</option>
+                <option value="right">Right</option>
+            </select>
+            <select id="startAnimation">
+                <option value="none">No Animation</option>
+                <option value="fade-in">Fade In</option>
+                <option value="slide-in">Slide In</option>
+            </select>
+            <select id="endAnimation">
+                <option value="none">No Animation</option>
+                <option value="fade-out">Fade Out</option>
+                <option value="slide-out">Slide Out</option>
+            </select>
+            <button id="addText">Add Text</button>
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const textColor = document.getElementById('textColor');
+        const fontSize = document.getElementById('fontSize');
+        const textAlignment = document.getElementById('textAlignment');
+        const startAnimation = document.getElementById('startAnimation');
+        const endAnimation = document.getElementById('endAnimation');
+        const addTextButton = document.getElementById('addText');
+        const carouselInner = document.getElementById('carouselInner');
+        const slides = document.querySelectorAll('.slide');
+        const prevSlideButton = document.getElementById('prevSlide');
+        const nextSlideButton = document.getElementById('nextSlide');
+
+        let currentIndex = 0;
+
+        
+        const updateSlidePosition = () => {
+            carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+        };
+
+        prevSlideButton.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateSlidePosition();
+        });
+
+        nextSlideButton.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateSlidePosition();
+        });
+
+     
+        textInput.addEventListener('input', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.textContent = textInput.value;
+        });
+
+       
+        textColor.addEventListener('input', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.style.color = textColor.value;
+        });
+
+       
+        fontSize.addEventListener('change', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.style.fontSize = `${fontSize.value}px`;
+        });
+
+        
+        textAlignment.addEventListener('change', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.style.textAlign = textAlignment.value;
+        });
+
+        
+        addTextButton.addEventListener('click', () => {
+            const newText = document.createElement('div');
+            newText.textContent = 'New Text';
+            newText.className = 'text-overlay';
+            newText.style.top = '50%';
+            newText.style.left = '50%';
+            newText.style.transform = 'translate(-50%, -50%)';
+            newText.contentEditable = true;
+            enableDrag(newText);
+            slides[currentIndex].appendChild(newText);
+        });
+
+       
+        const enableDrag = (element) => {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            element.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    element.style.left = `${e.clientX - offsetX}px`;
+                    element.style.top = `${e.clientY - offsetY}px`
+
+              
+              }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        };
+
+       
+        document.querySelectorAll('.text-overlay').forEach(enableDrag);
+
+        
+        startAnimation.addEventListener('change', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.classList.remove('fade-in', 'slide-in');
+            if (startAnimation.value !== 'none') {
+                activeTextOverlay.classList.add(startAnimation.value);
+            }
+        });
+
+        endAnimation.addEventListener('change', () => {
+            const activeTextOverlay = slides[currentIndex].querySelector('.text-overlay');
+            activeTextOverlay.classList.remove('fade-out', 'slide-out');
+            if (endAnimation.value !== 'none') {
+                activeTextOverlay.classList.add(endAnimation.value);
+            }
+        });
+
+       
+        const style = document.createElement('style');
+        style.textContent = `
+            .fade-in {
+                animation: fadeIn 1s forwards;
+            }
+            .fade-out {
+                animation: fadeOut 1s forwards;
+            }
+            .slide-in {
+                animation: slideIn 1s forwards;
+            }
+            .slide-out {
+                animation: slideOut 1s forwards;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+
+            @keyframes slideIn {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(0); }
+            }
+
+            @keyframes slideOut {
+                from { transform: translateX(0); }
+                to { transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
